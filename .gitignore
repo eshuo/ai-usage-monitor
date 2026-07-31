@@ -1,0 +1,12 @@
+# Rust
+target/
+
+# Tauri
+gen/schemas/
+
+# Backup
+_backup/
+
+# OS
+Thumbs.db
+.DS_Store

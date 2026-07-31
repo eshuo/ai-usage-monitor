@@ -1,0 +1,32 @@
+[package]
+name = "ai-usage-monitor"
+version = "1.0.0"
+description = "AI 厂商订阅用量查询工具"
+authors = [""]
+edition = "2021"
+
+[lib]
+name = "ai_usage_monitor_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time"] }
+dirs = "5"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4"] }
+futures = "0.3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
