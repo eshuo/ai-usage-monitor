@@ -262,10 +262,11 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            // 关闭窗口 = 隐藏到托盘
+            // 关闭窗口 = 隐藏到托盘（不阻止默认关闭，让窗口真正关闭）
             if let WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {
-                    api.prevent_close();
+                    // 不调用 api.prevent_close()，让窗口关闭
+                    // 托盘图标仍在，进程不会退出
                     let _ = window.hide();
                 }
             }
