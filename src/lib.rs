@@ -179,6 +179,18 @@ fn format_reset_time_rust(resets_at: Option<&str>) -> String {
 
 // ── 应用启动 ──────────────────────────────────────────────
 
+/// 显示并置顶主窗口
+fn show_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        // Windows 前台锁定策略下 set_focus 可能失效，先临时置顶强制窗口浮到最上层
+        let _ = window.set_always_on_top(true);
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+        let _ = window.set_always_on_top(false);
+    }
+}
+
 pub fn run() {
     let mut builder = tauri::Builder::default();
 
@@ -213,15 +225,7 @@ pub fn run() {
                         ..
                     } = event
                     {
-                        let app = tray.app_handle();
-                        if let Some(window) = app.get_webview_window("main") {
-                            if window.is_visible().unwrap_or(false) {
-                                let _ = window.hide();
-                            } else {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
+                        show_main_window(tray.app_handle());
                     }
                 })
                 .build(app)?;
@@ -271,10 +275,7 @@ pub fn run() {
     let builder = builder.on_menu_event(move |app, event| {
         match event.id().as_ref() {
             "show" => {
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
-                }
+                show_main_window(app);
             }
             "refresh" => {
                 let app_handle: tauri::AppHandle = app.clone();
@@ -284,9 +285,8 @@ pub fn run() {
                 });
             }
             "settings" => {
+                show_main_window(app);
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
                     let _ = window.emit("navigate", "settings");
                 }
             }
