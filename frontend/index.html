@@ -13,7 +13,6 @@
     <h1>📊 AI 用量监控</h1>
     <div class="header-actions">
       <button class="icon-btn" id="btn-refresh" title="刷新">🔄</button>
-      <button class="icon-btn" id="btn-minimize" title="最小化到托盘">📥</button>
     </div>
   </div>
 
@@ -92,6 +91,22 @@
         <div>数据仅存储在本地</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 关闭确认弹窗 -->
+<div id="close-modal" class="modal-overlay" style="display: none;">
+  <div class="modal">
+    <div class="modal-title">关闭程序</div>
+    <div class="modal-desc">选择关闭方式</div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="btn-close-tray">最小化到托盘</button>
+      <button class="btn danger" id="btn-close-quit">退出程序</button>
+    </div>
+    <label class="modal-remember">
+      <input type="checkbox" id="close-remember">
+      <span>记住我的选择，下次不再询问</span>
+    </label>
   </div>
 </div>
 

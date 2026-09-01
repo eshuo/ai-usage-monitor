@@ -66,10 +66,51 @@ function bindEvents() {
     await invoke('refresh_usage');
   });
 
-  // 最小化按钮
-  document.getElementById('btn-minimize').addEventListener('click', () => {
+  // 关闭确认弹窗
+  const closeModal = document.getElementById('close-modal');
+  const closeRemember = document.getElementById('close-remember');
+
+  // 检查是否已记住选择
+  const savedChoice = localStorage.getItem('closeAction');
+  if (savedChoice) {
+    // 已记住，直接执行
+    if (savedChoice === 'tray') {
+      invoke('hide_window');
+    } else if (savedChoice === 'quit') {
+      invoke('quit_app');
+    }
+  }
+
+  document.getElementById('btn-close-tray').addEventListener('click', () => {
+    if (closeRemember.checked) {
+      localStorage.setItem('closeAction', 'tray');
+    }
+    closeModal.style.display = 'none';
     invoke('hide_window');
   });
+
+  document.getElementById('btn-close-quit').addEventListener('click', () => {
+    if (closeRemember.checked) {
+      localStorage.setItem('closeAction', 'quit');
+    }
+    closeModal.style.display = 'none';
+    invoke('quit_app');
+  });
+
+  // 监听后端关闭请求事件
+  if (window.__TAURI__ && window.__TAURI__.event) {
+    window.__TAURI__.event.listen('close-requested', () => {
+      // 再次检查记住的选择（可能刚设置）
+      const choice = localStorage.getItem('closeAction');
+      if (choice === 'tray') {
+        invoke('hide_window');
+      } else if (choice === 'quit') {
+        invoke('quit_app');
+      } else {
+        closeModal.style.display = 'flex';
+      }
+    });
+  }
 
   // 添加厂商
   document.getElementById('provider-select').addEventListener('change', renderDynamicFields);

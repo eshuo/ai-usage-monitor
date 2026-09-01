@@ -78,6 +78,11 @@ fn hide_window(app: tauri::AppHandle) {
     }
 }
 
+#[tauri::command]
+fn quit_app(app: tauri::AppHandle) {
+    app.exit(0);
+}
+
 // ── 内部刷新逻辑 ──────────────────────────────────────────
 
 async fn refresh_all_inner(app: &tauri::AppHandle, state: &AppState) {
@@ -262,12 +267,11 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            // 关闭窗口 = 隐藏到托盘（不阻止默认关闭，让窗口真正关闭）
+            // 关闭窗口 = 发送事件给前端，由前端决定隐藏或退出
             if let WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {
-                    // 不调用 api.prevent_close()，让窗口关闭
-                    // 托盘图标仍在，进程不会退出
-                    let _ = window.hide();
+                    api.prevent_close();
+                    let _ = window.emit("close-requested", ());
                 }
             }
         });
@@ -311,6 +315,7 @@ pub fn run() {
             refresh_usage,
             query_one,
             hide_window,
+            quit_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
